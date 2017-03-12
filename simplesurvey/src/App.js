@@ -1,12 +1,26 @@
 import React, { Component } from 'react';
 import './App.css';
+// npm install --save firebase uuid:
+var uuid = require('uuid'); // automatically creates id
+var firebase = require('firebase'); // nosql database firebase.google.com cloud
 
+  // Initialize Firebase - Firebase will provide you the below lines to add.
+  var config = {
+    apiKey: "AIzaSyBrs0C95sf728okm6d01Phbz5gi1b8nsr0",
+    authDomain: "phpss-react-simple-survey-app.firebaseapp.com",
+    databaseURL: "https://phpss-react-simple-survey-app.firebaseio.com",
+    storageBucket: "phpss-react-simple-survey-app.appspot.com",
+    messagingSenderId: "1073329495471"
+  };
+  firebase.initializeApp(config);
+  // End Initialize Firebase
+  
 class App extends Component {
   
   constructor(props) {
     super(props);
     this.state = {
-      id: '',
+      id: uuid.v1(), // automatically creates id
       name:'',
       answers: {
         q1: '',
@@ -29,7 +43,14 @@ class App extends Component {
   }
   
   handleQuestionSubmit(event) {
-      
+      firebase.database().ref('surveys/' + this.state.id).set({
+        name: this.state.name,
+        answers: this.state.answers
+      });
+      this.setState({submitted: true}, function() {
+        console.log('Questions Submitted');
+      });
+      event.preventDefault();
   }
   
   handleQuestionChange(event) {
@@ -98,6 +119,7 @@ class App extends Component {
             <input type="radio" name="q4" value="Farscape" onChange={this.handleQuestionChange} />Farscape<br />
             <input type="radio" name="q4" value="Other" onChange={this.handleQuestionChange} />Other<br />
           </div>
+            <input type="submit" value="Submit" />
         </form>
       </span>
     } else if(!this.state.name && this.state.submitted === false) {
@@ -109,7 +131,7 @@ class App extends Component {
         </span>
         questions = ''; 
     } else if (this.state.submitted === true) {
-      
+      user = <h2>Thank You {this.state.name}</h2>
     }
     return (
       <div className="App">
